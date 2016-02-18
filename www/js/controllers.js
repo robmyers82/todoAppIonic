@@ -1,6 +1,6 @@
-angular.module('starter.controllers', [])
+angular.module('starter.controllers', ['ngStorage'])
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout, $http) {
+.controller('AppCtrl', function($scope, $ionicModal, $timeout, $http, $localStorage, isLoggedIn) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -11,6 +11,7 @@ angular.module('starter.controllers', [])
 
   // Form data for the login modal
   $scope.loginData = {};
+  $scope.loggedIn = isLoggedIn;
 
   // Create the login modal that we will use later
   $ionicModal.fromTemplateUrl('templates/login.html', {
@@ -29,12 +30,22 @@ angular.module('starter.controllers', [])
     $scope.modal.show();
   };
 
+  $scope.logout = function() {
+    delete $localStorage.user_id;
+    delete $localStorage.token;
+    $scope.loggedIn = false;
+  };
+
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
     $http.post("http://localhost:8080/api/login", { email: $scope.loginData.username, password: $scope.loginData.password }).then(function(result) {
         if (result.data.loginstatus == "success") {
             // successful login, in our example, we will just send an alert message
+            $localStorage.user_id = result.data.userid;
+            $localStorage.token = result.data.token;
+            $scope.loggedIn = true;
             alert("Congrats, you logged in with user ID "+result.data.userid);
+            $scope.modal.hide();
         }
         else {
             // unsuccessful login.  In our example, we are just sending an alert message
@@ -47,16 +58,53 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('PlaylistsCtrl', function($scope) {
-  $scope.playlists = [
-    { title: 'Reggae', id: 1 },
-    { title: 'Chill', id: 2 },
-    { title: 'Dubstep', id: 3 },
-    { title: 'Indie', id: 4 },
-    { title: 'Rap', id: 5 },
-    { title: 'Cowbell', id: 6 }
-  ];
-})
+.controller('TodoCtrl', function($state, $scope, $http, $ionicLoading, $localStorage) {
+  $scope.todos = [];
 
-.controller('PlaylistCtrl', function($scope, $stateParams) {
+  $ionicLoading.show({
+      template: 'Loading Todos...'
+  });
+  
+  $http.get("http://localhost:8080/api/todos").then(function(result) {
+      $scope.todos = result.data;
+      $ionicLoading.hide();
+  }, function(error) {
+      alert("There was a problem getting your profile.  Check the logs for details.");
+      console.log(error);
+      $ionicLoading.hide();
+  });
+
+  $scope.addTodo = function(newtodo) {
+
+    $ionicLoading.show({
+      template: 'Adding your Todo...'
+    });
+
+    $http.post("http://localhost:8080/api/phonetodos", {
+      token: $localStorage.token,
+      user_id: $localStorage.user_id,
+      info: newtodo
+    }).then(function(result) {
+        $scope.todos = result.data;
+        $state.go('app.todos');
+        $ionicLoading.hide();
+    }, function(error) {
+        alert("There was a problem getting your profile.  Check the logs for details.");
+        console.log(error);
+        $ionicLoading.hide();
+        $state.go('app.todos');
+    });
+  }
+
+  $scope.deleteTodo = function(id) {
+      $ionicLoading.show({
+        template: 'Removing your Todo...'
+      });
+
+      $http.delete('http://localhost:8080/api/todos/' + id).success(function(data) {
+          $scope.todos = data; // assign our new list of todos
+          $state.go($state.current, {}, {reload: true});
+          $ionicLoading.hide();
+      });
+  };
 });

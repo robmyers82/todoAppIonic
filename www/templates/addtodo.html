@@ -1,0 +1,22 @@
+<ion-view view-title="Add a Todo">
+  <ion-content padding="true">
+    <h1>Add a Todo</h1>
+    
+    <div class="list list-inset">
+	  <label class="item item-input">
+	    <input type="text" ng-model="newtodo.text" placeholder="Todo">
+	  </label>
+	  <label class="item item-input">
+	    <input type="text" ng-model="newtodo.address" placeholder="Address">
+	  </label>
+	  <label class="item item-input">
+	    <input type="text" ng-model="newtodo.price" placeholder="Price">
+	  </label>
+	</div>
+
+	<button ng-click="addTodo(newtodo)" class="button button-block button-balanced">
+	  Add a Todo
+	</button>
+
+  </ion-content>
+</ion-view>

@@ -14,21 +14,21 @@
 
   <ion-side-menu side="left">
     <ion-header-bar class="bar-stable">
-      <h1 class="title">Left</h1>
+      <h1 class="title">Menu Yo!</h1>
     </ion-header-bar>
     <ion-content>
       <ion-list>
-        <ion-item menu-close ng-click="login()">
+        <ion-item ng-hide="loggedIn" menu-close ng-click="login()">
           Login
         </ion-item>
-        <ion-item menu-close href="#/app/search">
-          Search
+        <ion-item menu-close href="#/app/welcome">
+          Welcome!
         </ion-item>
-        <ion-item menu-close href="#/app/browse">
-          Browse
+        <ion-item ng-show="loggedIn" menu-close href="#/app/todos">
+          To Dos
         </ion-item>
-        <ion-item menu-close href="#/app/playlists">
-          Playlists
+        <ion-item ng-show="loggedIn" menu-close ng-click="logout()">
+          Logout
         </ion-item>
       </ion-list>
     </ion-content>

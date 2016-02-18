@@ -1,0 +1,14 @@
+<ion-view view-title="Todo List">
+  <ion-content padding="true">
+    <h1>Todos</h1>
+    <a href="#/app/todo/add" class="button button-block button-balanced">
+	  Add a Todo
+	</a>
+
+    <div class="checkbox" ng-repeat="todo in todos">
+        <label>
+            <input type="checkbox" ng-click="deleteTodo(todo._id)"> {{ todo.text }} ({{ todo.price }}) - {{ todo.author }} at {{ todo.address }}
+        </label>
+    </div>
+  </ion-content>
+</ion-view>
